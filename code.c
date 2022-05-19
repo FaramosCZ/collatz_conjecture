@@ -1,30 +1,22 @@
-/*
-ASCII:
-  number '48' is char '0'
-  number '49' is char '1'
-  number '50' is char '2'
-  number '51' is char '3'
-  number '52' is char '4'
-  number '53' is char '5'
-  number '54' is char '6'
-  number '55' is char '7'
-  number '56' is char '8'
-  number '57' is char '9'
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#define  ASCII_ZERO 48
 
 // Declare glbal pointer to memory in which each byte will represent a char.
 const unsigned short size_of_unsigned_short = sizeof(unsigned short);
 
-unsigned short *data;
+unsigned short *data = NULL;
 unsigned int size_of_allocated_memory;
 
 unsigned short carry = 0;
 
-int filename_num = 1;
+// In each iteration two files are used
+// From one the old_value is read, to the second the new_value is written
+// The initial file is always named 'seed'.
+// This is then changed to name 'result_x', where 'x' is the 'filename_num' variable which is incremented in each iteration
 char filename[200] = "seed";
+int filename_num = 1;
 
 // ------------------------------
 int load_number_from_file()
@@ -45,6 +37,7 @@ int load_number_from_file()
    if ( data == NULL )
      {
       fprintf(stderr, "Unable to allocate enough memory. Tried to allocate %d bytes", size_of_allocated_memory);
+      fclose(fp);
       return 1;
      }
 
@@ -52,7 +45,7 @@ int load_number_from_file()
 
    for(unsigned int i = 0; i < size_of_allocated_memory ; i = i + size_of_unsigned_short)
      {
-      *(data+i) = getc(fp) - 48;
+      *(data+i) = getc(fp) - ASCII_ZERO;
      }
 
   if (fclose(fp))
@@ -67,12 +60,12 @@ int load_number_from_file()
 // ------------------------------
 int print_number(FILE * stream)
   {
-   if(carry != 0) fprintf(stream, "%c", carry+48);
+   if(carry != 0) fprintf(stream, "%c", carry+ASCII_ZERO);
 
    for(unsigned int i = 0; i < size_of_allocated_memory ; i = i + size_of_unsigned_short)
      {
       if( i==0 && *(data+i) == 0) continue;
-      fprintf(stream, "%c", *(data+i) + 48 );
+      fprintf(stream, "%c", *(data+i) + ASCII_ZERO );
      }
 
    if (stream == stdout ) printf("\n");
@@ -81,6 +74,9 @@ int print_number(FILE * stream)
   }
 
 // ------------------------------
+// The operation is actually 'new_value = 3 * old_value + 1'
+// That's why carry value is set to 1 at the beginning
+
 int multiply()
   {
    carry = 1;
@@ -116,7 +112,12 @@ int save_number_to_file()
      }
 
    print_number(fp);
-   fclose(fp);
+
+   if (fclose(fp))
+     {
+      printf("error closing file.");
+      exit(-1);
+     }
 
    return 0;
   }
@@ -157,7 +158,9 @@ int main()
 
        save_number_to_file();
        free(data);
+       data = NULL;
     }
+    // this means WHILE the result is more than one digit long
     while(size_of_allocated_memory > size_of_unsigned_short);
 
   return 0;

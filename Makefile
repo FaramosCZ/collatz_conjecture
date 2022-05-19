@@ -1,4 +1,4 @@
 program:
-	gcc -Wall -Werror -Wextra -pedantic -o program code.c
+	gcc -Wall -Werror -Wextra -pedantic -g -O0 -o program code.c
 clean:
 	rm program
