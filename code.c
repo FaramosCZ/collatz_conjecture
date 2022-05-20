@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define  ASCII_ZERO 48
 
@@ -32,7 +33,8 @@ int load_number_from_file()
      }
 
    fseek(fp, 0, SEEK_END);
-   size_of_allocated_memory = size_of_unsigned_short * ( ftell(fp) - 0 );
+   printf("\t\t\tNumber of digits: %ld", ftell(fp));
+   size_of_allocated_memory = size_of_unsigned_short * ftell(fp) ;
    data = malloc(size_of_allocated_memory);
    if ( data == NULL )
      {
@@ -43,7 +45,7 @@ int load_number_from_file()
 
    fseek(fp, 0, SEEK_SET);
 
-   for(unsigned int i = 0; i < size_of_allocated_memory ; i = i + size_of_unsigned_short)
+   for(unsigned int i = 0 ; i < (size_of_allocated_memory / size_of_unsigned_short) ; i++)
      {
       *(data+i) = getc(fp) - ASCII_ZERO;
      }
@@ -62,7 +64,7 @@ int print_number(FILE * stream)
   {
    if(carry != 0) fprintf(stream, "%c", carry+ASCII_ZERO);
 
-   for(unsigned int i = 0; i < size_of_allocated_memory ; i = i + size_of_unsigned_short)
+   for(unsigned int i = 0; i < (size_of_allocated_memory / size_of_unsigned_short) ; i++)
      {
       if( i==0 && *(data+i) == 0) continue;
       fprintf(stream, "%c", *(data+i) + ASCII_ZERO );
@@ -82,15 +84,15 @@ int multiply()
    carry = 1;
    unsigned short value;
 
-   for(unsigned int i = size_of_unsigned_short; i <= size_of_allocated_memory ; i = i + size_of_unsigned_short)
+   for(unsigned int i = size_of_unsigned_short; i <= (size_of_allocated_memory / size_of_unsigned_short) ; i++)
      {
-       value = *(data+size_of_allocated_memory-i);
+       value = *(data+(size_of_allocated_memory / size_of_unsigned_short)-i);
        value = (value * 3) + carry;
 
        carry = value / 10;
        value = value % 10;
 
-       *(data+size_of_allocated_memory-i) = value;
+       *(data+(size_of_allocated_memory / size_of_unsigned_short)-i) = value;
      }
 
    return 0;
@@ -102,7 +104,7 @@ int save_number_to_file()
    FILE *fp;
 
    sprintf(filename,"result_%d",filename_num);
-   filename_num++;
+   //filename_num++;
 
    fp = fopen(filename, "w");
    if ( fp == NULL )
@@ -128,7 +130,7 @@ int divide()
    carry = 0;
    unsigned short value;
 
-   for(unsigned int i = 0; i < size_of_allocated_memory ; i = i + size_of_unsigned_short)
+   for(unsigned int i = 0; i < (size_of_allocated_memory / size_of_unsigned_short) ; i++)
      {
       value = *(data+i) + carry*10;
       carry = value % 2;
@@ -145,23 +147,35 @@ int divide()
 int main()
   {
 
+   unsigned long iteration = 1;
+
    do
      {
-       load_number_from_file();
-       print_number(stdout);
+      printf("Iteration: %lu", iteration++);
 
-       if( *(data + size_of_allocated_memory - size_of_unsigned_short) % 2 == 0 )
-         { divide(); }
+       load_number_from_file();
+       //print_number(stdout);
+
+       if( *(data + (size_of_allocated_memory / size_of_unsigned_short) - size_of_unsigned_short) % 2 == 0 )
+         {
+          printf("\t\t\tD\n");
+          divide();
+         }
        else
-         { multiply(); }
+         {
+          printf("\t\t\tM\n");
+          multiply();
+         }
 //       print_number(stdout);
 
        save_number_to_file();
        free(data);
        data = NULL;
+
+       //usleep(1000*10);
     }
     // this means WHILE the result is more than one digit long
-    while(size_of_allocated_memory > size_of_unsigned_short);
+    while(size_of_allocated_memory >= size_of_unsigned_short);
 
   return 0;
   }
