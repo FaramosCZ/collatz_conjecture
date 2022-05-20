@@ -44,7 +44,8 @@ int load_number_from_file()
    //   This assumes the digits are 'char' of size 1 byte AND there is nothing but the digits in the file (e.g. no newline at the end of the file)
    fseek(fp, 0, SEEK_END);
    number_of_digits = ftell(fp);
-   if ( VERBOSITY ) { printf("\t\tNumber of digits: %d", number_of_digits); }
+   if ( VERBOSITY == 1 ) { printf("\tD: %d", number_of_digits); }
+   if ( VERBOSITY == 2 ) { printf("\t\tNumber of digits: %d", number_of_digits); }
 
    data = malloc( number_of_digits * sizeof(uint8_t) );
    if ( data == NULL )
@@ -172,7 +173,8 @@ int main()
 
    do
      {
-      if ( VERBOSITY ) { printf("Iteration: %lu", iteration++); }
+      if ( VERBOSITY == 1 ) { printf("I: %lu", iteration++); }
+      if ( VERBOSITY == 2 ) { printf("Iteration: %lu", iteration++); }
 
       load_number_from_file();
       // For numbers with milions of digits we might not want to print every one of them
@@ -181,12 +183,14 @@ int main()
 
        if( data[ number_of_digits - 1 ] % 2 == 0 )
          {
-          if ( VERBOSITY ) { printf("\t\t D\n"); }
+          if ( VERBOSITY == 1 ) { printf("\t D\n"); }
+          if ( VERBOSITY == 2 ) { printf("\t\t D\n"); }
           divide();
          }
        else
          {
-          if ( VERBOSITY ) { printf("\t\tM\n"); }
+          if ( VERBOSITY == 1 ) { printf("\tM\n"); }
+          if ( VERBOSITY == 2 ) { printf("\tM\n"); }
           multiply();
          }
 
