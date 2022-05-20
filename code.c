@@ -50,7 +50,7 @@ int load_number_from_file()
    // Load the digits to the allocated memory
    fseek(fp, 0, SEEK_SET);
    for ( unsigned int i = 0 ; i < number_of_digits ; i++ )
-     { *(data+i) = getc(fp) - ASCII_ZERO; }
+     { data[i] = getc(fp) - ASCII_ZERO; }
 
   if ( fclose(fp) )
     { printf("error closing file."); exit(-1); }
@@ -67,13 +67,10 @@ int print_number(FILE * stream)
    for ( unsigned int i = 0; i < number_of_digits ; i++)
      {
       // After division, we may have underflowed the decimal order
-      if( i==0 && *(data+i) == 0) continue;
+      if( i==0 && data[i] == 0) continue;
 
-      fprintf( stream, "%c", *(data+i) + ASCII_ZERO );
+      fprintf( stream, "%c", data[i] + ASCII_ZERO );
      }
-
-   // Additional formatiing
-   if ( stream == stdout ) printf("\n");
 
    return 0;
   }
@@ -113,13 +110,13 @@ int multiply()
 
    for( unsigned int i = 1 ; i <= number_of_digits ; i++ )
      {
-       value = *( data + number_of_digits - i );
+       value = data[ number_of_digits - i ];
        value = (value * 3) + carry;
 
        carry = value / 10;
        value = value % 10;
 
-       *( data + number_of_digits - i ) = value;
+       data[ number_of_digits - i ] = value;
      }
 
    return 0;
@@ -134,11 +131,11 @@ int divide()
 
    for( unsigned int i = 0 ; i < number_of_digits ; i++ )
      {
-      value = *( data + i ) + ( carry * 10 );
+      value = data[i] + ( carry * 10 );
       carry = value % 2;
       value = value / 2;
 
-      *( data + i ) = value;
+      data[i] = value;
      }
 
    // erase the carry 'bit' again, so no leftover is left behind for the 'print_number()' function
@@ -159,9 +156,9 @@ int main()
 
       load_number_from_file();
       // For numbers with milions of digits we might not want to print every one of them
-//      print_number(stdout);
+//      printf("\tValue: "); print_number( stdout ); printf(" ");
 
-       if( *( data + number_of_digits - 1 ) % 2 == 0 )
+       if( data[ number_of_digits - 1 ] % 2 == 0 )
          {
           printf("\t\t\tD\n");
           divide();
