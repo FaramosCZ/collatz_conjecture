@@ -75,6 +75,22 @@ int print_number(FILE * stream)
    return 0;
   }
 
+int print_number_last(FILE * stream)
+  {
+   // After multiplication we may have overflowed the the decimal order by one
+   if ( carry != 0 ) fprintf(stream, "%c", carry+ASCII_ZERO);
+
+   for ( unsigned int i = number_of_digits - 20 ; i < number_of_digits ; i++)
+     {
+      // After division, we may have underflowed the decimal order
+      if( i==0 && data[i] == 0) continue;
+
+      fprintf( stream, "%c", data[i] + ASCII_ZERO );
+     }
+
+   return 0;
+  }
+
 // ------------------------------
 int save_number_to_file()
   {
@@ -157,10 +173,11 @@ int main()
       load_number_from_file();
       // For numbers with milions of digits we might not want to print every one of them
 //      printf("\tValue: "); print_number( stdout ); printf(" ");
+      printf("\t\tLast 20 digits: ..."); print_number_last( stdout ); printf(" ");
 
        if( data[ number_of_digits - 1 ] % 2 == 0 )
          {
-          printf("\t\t\tD\n");
+          printf("\t\t\t D\n");
           divide();
          }
        else
