@@ -7,24 +7,27 @@
 
 #define  ASCII_ZERO 48
 
+#define VERBOSITY 1
+#define MULTIPLE_RESULT_FILES 0
+
 // Declare a global pointer to memory where the digits are stored
 //   Since I work with digits 0-9, I only need 4 bits.
 //   Though it is efficent to allow a mathematical arithmetic on those digits - like multiplication - which leads to numbers larger than a single digit.
 //   Also in C language it is hard to work with less than a byte variables, so stay with 'uint8_t' to save memory, but also allow some space for the arithmetic around
-uint8_t *data = NULL;
+static uint8_t *data = NULL;
 // Counter of how many digits the large number have
 //   We need this for easy iteration over those digits
-unsigned int number_of_digits;
+static unsigned int number_of_digits;
 // Carry 'bit'
 //   Wherever neede in manual division or multiplication
-uint8_t carry = 0;
+static uint8_t carry = 0;
 
 // In each iteration two files are used
 //   From one the old_value is read, to the second the new_value is written
 //   The initial file is always named 'seed'.
 //   This is then changed to name 'result_x', where 'x' is the 'filename_num' variable which is incremented in each iteration
-char filename[30] = "seed";
-int filename_num = 1;
+static char filename[30] = "seed";
+static int filename_num = 1;
 
 // ------------------------------
 int load_number_from_file()
@@ -41,7 +44,7 @@ int load_number_from_file()
    //   This assumes the digits are 'char' of size 1 byte AND there is nothing but the digits in the file (e.g. no newline at the end of the file)
    fseek(fp, 0, SEEK_END);
    number_of_digits = ftell(fp);
-   printf("\t\t\tNumber of digits: %d", number_of_digits);
+   if ( VERBOSITY ) { printf("\t\tNumber of digits: %d", number_of_digits); }
 
    data = malloc( number_of_digits * sizeof(uint8_t) );
    if ( data == NULL )
@@ -100,7 +103,7 @@ int save_number_to_file()
 
    // For large numbers, it may be VERY space consuming to save every result
    //   sometimes it might be better to disable the incrementation and stay with a single buffer file.
-//   filename_num++;
+   if ( MULTIPLE_RESULT_FILES ) { filename_num++; }
 
    fp = fopen( filename, "w" );
    if ( fp == NULL )
@@ -164,25 +167,26 @@ int main()
   {
    // Iteration counter
    //   useful when we don't want to store every result, we just want to keep the final one
+   #pragma GCC diagnostic error "-Wuninitialized"
    unsigned long iteration = 1;
 
    do
      {
-      printf("Iteration: %lu", iteration++);
+      if ( VERBOSITY ) { printf("Iteration: %lu", iteration++); }
 
       load_number_from_file();
       // For numbers with milions of digits we might not want to print every one of them
 //      printf("\tValue: "); print_number( stdout ); printf(" ");
-      printf("\t\tLast 20 digits: ..."); print_number_last( stdout ); printf(" ");
+        if ( VERBOSITY > 1) { printf("\t\tLast 20 digits: ..."); print_number_last( stdout ); printf(" "); }
 
        if( data[ number_of_digits - 1 ] % 2 == 0 )
          {
-          printf("\t\t\t D\n");
+          if ( VERBOSITY ) { printf("\t\t D\n"); }
           divide();
          }
        else
          {
-          printf("\t\t\tM\n");
+          if ( VERBOSITY ) { printf("\t\tM\n"); }
           multiply();
          }
 
