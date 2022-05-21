@@ -36,7 +36,7 @@
 // Measuring how long the program ran
 #include <time.h>
 
-#define  ASCII_ZERO 48
+#define ASCII_ZERO 48
 
 #define VERBOSITY 1
 #define MULTIPLE_RESULT_FILES 0
