@@ -6,6 +6,8 @@
 #include <stdint.h>
 // Signal catching for stopping the program gracefully
 #include <signal.h>
+// Measuring how long the program ran
+#include <time.h>
 
 #define  ASCII_ZERO 48
 
@@ -178,6 +180,10 @@ void sig_handler(int signum)
 // ------------------------------
 int main()
   {
+   // Start measuring time
+   time_t begin = time(NULL);
+
+
    // Register signal handler
    signal(SIGUSR1, sig_handler);
 
@@ -213,12 +219,14 @@ int main()
        free(data);
        data = NULL;
 
-       if ( signal_usr1 ) { fprintf(stderr, "\nSIGUSR1 has been caught, ending gracefully ...\n"); return 0; }
+       if ( signal_usr1 ) { fprintf(stderr, "\nSIGUSR1 has been caught, ending gracefully ...\n"); break; }
 
        // Artificial delay for debugging
 //       usleep(1000*10);
     }
     while( number_of_digits > 1 );
 
-  return 0;
+   printf("\nThe elapsed time is %ld seconds\n", ( (time_t) time(NULL) - begin ) );
+
+   return 0;
   }
