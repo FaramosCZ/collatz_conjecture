@@ -1,3 +1,32 @@
+// -------------------------------------------------------------------
+//
+// AUTHOR: Michal Schorm
+// DATE:   05/2022
+//
+// PURPOSE: Program that runs 'Collatz Conjecture' on HUGE numbers
+//
+// DESCRIPTION:
+//   The program takes a file named 'seed' as an input.
+//   In this file there must not be anything else than numbers 0-9. (no newlines etc.)
+//   The number must NOT start with digit '0'.
+//
+//   Number in this file is loaded to memory and then a rule is applied.
+//   If the number is even, it s divided by 2.
+//   If the number is odd, it is multiplied by 3 and then 1 is added. (making it an even number)
+//
+//   This rule is then applied again and again, until the number have only 1 digit.
+//   The 'Collatz Conjecture' states, that for any positive integer, this serie always coverge to a loop '1' -> '4' -> '2' -> '1'.
+//   Is it still not proven, whether this theorem is true for any positive integer.
+//
+//   This program tries to find an counter-example.
+//   As a seed, the 'Mersenne Primes' are used.
+//
+//   The output of the program is series of lines. On each line is:
+//   number of the iteration, amount of the digits the currently tested number has
+//   and 'D' or 'M' to indicate whether the next planned operation is Division or Multiplication.
+//
+// -------------------------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 // Data type 'uint8_t'
