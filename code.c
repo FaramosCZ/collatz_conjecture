@@ -4,6 +4,8 @@
 #include <unistd.h>
 // Data type 'uint8_t'
 #include <stdint.h>
+// Signal catching for stopping the program gracefully
+#include <signal.h>
 
 #define  ASCII_ZERO 48
 
@@ -28,6 +30,9 @@ static uint8_t carry = 0;
 //   This is then changed to name 'result_x', where 'x' is the 'filename_num' variable which is incremented in each iteration
 static char filename[30] = "seed";
 static int filename_num = 1;
+
+// Signal handling
+static uint8_t signal_usr1 = 0;
 
 // ------------------------------
 int load_number_from_file()
@@ -164,8 +169,18 @@ int divide()
   }
 
 // ------------------------------
+void sig_handler(int signum)
+  {
+   fprintf(stderr, "\nA SIGNAL HAS BEEN CAUGHT\n");
+   if ( signum == SIGUSR1 ) { signal_usr1++; }
+  }
+
+// ------------------------------
 int main()
   {
+   // Register signal handler
+   signal(SIGUSR1, sig_handler);
+
    // Iteration counter
    //   useful when we don't want to store every result, we just want to keep the final one
    #pragma GCC diagnostic error "-Wuninitialized"
@@ -197,6 +212,8 @@ int main()
        save_number_to_file();
        free(data);
        data = NULL;
+
+       if ( signal_usr1 ) { fprintf(stderr, "\nSIGUSR1 has been caught, ending gracefully ...\n"); return 0; }
 
        // Artificial delay for debugging
 //       usleep(1000*10);
