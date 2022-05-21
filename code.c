@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-// 'sleep()', 'usleep()'
-#include <unistd.h>
 // Data type 'uint8_t'
 #include <stdint.h>
 // Signal catching for stopping the program gracefully
@@ -221,8 +219,6 @@ int main()
 
        if ( signal_usr1 ) { fprintf(stderr, "\nSIGUSR1 has been caught, ending gracefully ...\n"); break; }
 
-       // Artificial delay for debugging
-//       usleep(1000*10);
     }
     while( number_of_digits > 1 );
 
